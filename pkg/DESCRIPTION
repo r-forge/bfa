@@ -7,13 +7,14 @@ Type: Package
 LazyLoad: yes
 Author: Jared Murray
 Description: This package provides model fitting for several Bayesian factor models
-    including Gaussian, ordinal probit, mixed and semiparametric copula factor models.
-    Normal, continuous shrinkage and point-mass sparsity priors for factor loadings are
-    available. Currently only exploratory factor models are implemented.
+    including Gaussian, ordinal probit, mixed and semiparametric copula factor
+    models. Normal, continuous shrinkage and point-mass sparsity priors for factor
+    loadings are available. Currently only exploratory factor models are
+    implemented.
 SystemRequirements: GNU make
 Version: 0.1
 Date: 2011-06-03
 Depends: Rcpp (>= 0.8.6), RcppArmadillo, ggplot2, coda
 Suggests: ggplot2
 Collate: 'bfa-package.R' 'class.R' 'get_coda.R' 'main.R' 'plot_loadings.R' 'plots.R'
-    'ratings08.R'
+    'postproc.R' 'ratings08.R'

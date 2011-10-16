@@ -1,8 +1,8 @@
 \name{bfa_model}
 \alias{bfa_model}
 \title{Initialize a bfa model...}
-\usage{bfa_model(x, data, num.factor=1, restrict=NA, normal.dist=NA, center.data=TRUE, scale.data=FALSE,
-    init=TRUE, ...)
+\usage{bfa_model(x, data, num.factor=1, restrict=NA, normal.dist=NA, center.data=TRUE,
+    scale.data=FALSE, init=TRUE, ...)
 }
 \description{Initialize a bfa model}
 \details{This function accepts a data matrix \code{D} and specified options,

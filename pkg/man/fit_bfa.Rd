@@ -16,8 +16,7 @@ loadings.var: Factor loading prior variance
 tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
 rho.a, rho.b: Beta hyperparameters for point mass prior
 sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
-gdp.alpha, gdp.beta: GDP prior parameters
-'}
+gdp.alpha, gdp.beta: GDP prior parameters}
 \value{The S3 \code{bfa} object \code{model}, now with posterior samples/summaries.}
 \arguments{\item{model}{an object of type bfa, as returned by bfa(data)}
 \item{nsim}{number of iterations past burn-in}

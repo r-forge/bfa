@@ -30,6 +30,60 @@ return()
 .MCMCstep <- function (Z_, A_, F_, tauinv_, rho_, Ra_, maxes_, argsorts_, A_restrict_, priors_, nsim_, nburn_, thin_, printstatus_, keep.scores, keep.loadings, more_args)
 .Call("MCMCstep", Z_, A_, F_, tauinv_, rho_, Ra_, maxes_, argsorts_, A_restrict_, priors_, nsim_, nburn_, thin_, printstatus_, keep.scores, keep.loadings, more_args, PACKAGE = "bfa")
 
+#' Initialize and fit a Gaussian factor model
+#'
+#' This function performs a specified number of MCMC iterations and
+#' returns an object containing summary statistics from the MCMC samples
+#' as well as the actual samples if keep.scores or keep.loadings are \code{TRUE}.
+#' Default behavior is to save only the loadings. 
+#' 
+#' Additional parameters:
+#' Prior parameters
+#' tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions
+#' rho.a, rho.b: Beta hyperparameters for point mass prior
+#' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
+#' gdp.alpha, gdp.beta: GDP prior parameters
+#' 
+#' @param x A formula, matrix or bfa object. 
+#' @param data The data if x is a formula
+#' @param num.factor Number of factors
+#' @param restrict A matrix or list giving restrictions on factor loadings. A matrix should be the 
+#' same size as the loadings matrix. Acceptable values are 0 (identically 0), 1 (unrestricted), 
+#' or 2 (strictly positive). List elements should be character vectors of the form c("variable",1, ">0")
+#' where 'variable' is the manifest variable, 1 is the factor, and ">0" is the restriction. Acceptable
+#' restrictions are ">0" or "0".
+#' @param center.data Center data
+#' @param scale.data  Scale data
+#' @param nsim Number of iterations past burn-in
+#' @param nburn Number of initial (burn-in) iterations to discard
+#' @param thin Keep every thin'th MCMC sample (i.e. save nsim/thin samples)
+#' @param print.status How often to print status messages to console
+#' @param keep.scores Save samples of factor scores
+#' @param keep.loadings Save samples of factor loadings
+#' @param loading.prior Specify point mass ("pointmass", default) or normal priors ("normal") 
+#' @param coda Create \code{mcmc} objects to allow use of functions from the 
+#' \code{coda} package: "all" for loadings and scores, "loadings" or "scores" for one or the
+#' other, or "none" for neither
+#' @param ... Prior parameters and other (experimental) arguments (see details)
+#' @return An S3 \code{bfa} object \code{model}, with posterior samples/summaries.
+#' @export
+
+bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA, 
+                center.data=TRUE, scale.data=TRUE, nsim=0, nburn=0, thin=1,
+                print.status=500, keep.scores=FALSE, keep.loadings=TRUE,
+                loading.prior="pointmass", 
+                coda="loadings", ...) {
+  fr = model.frame(x, data=data, na.action=NULL)
+  d = dim(fr)
+  normal.dist = rep(1, d[2])
+  .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
+       center.data=center.data, scale.data=scale.data, nsim=nsim, nburn=nburn, thin=thin,
+       print.status=print.status, keep.scores=keep.scores, keep.loadings=keep.loadings,
+       loading.prior=loading.prior, factor.scales=TRUE, px=FALSE, coda=coda, 
+       imh=FALSE, ...) 
+                
+}
+
 #' Initialize and fit a bfa model
 #'
 #' This function performs a specified number of MCMC iterations and
@@ -44,16 +98,144 @@ return()
 #' rho.a, rho.b: Beta hyperparameters for point mass prior
 #' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
 #' gdp.alpha, gdp.beta: GDP prior parameters
-#' '
+#' 
 #' @param x A formula, matrix or bfa object. 
 #' @param data The data if x is a formula
 #' @param num.factor Number of factors
 #' @param restrict A matrix or list giving restrictions on factor loadings. A matrix should be the 
 #' same size as the loadings matrix. Acceptable values are 0 (identically 0), 1 (unrestricted), 
-#' or 2 (strictly positive). List elements should be character vectors of the form c('variable',1, '>0')
-#' where 'variable' is the manifest variable, 1 is the factor, and '>0' is the restriction. Acceptable
-#' restrictions are '>0' or '0'.
-#' @param normal.dist A character vector specifying which variables should be treated as observed Gaussian
+#' or 2 (strictly positive). List elements should be character vectors of the form c('variable',1, ">0")
+#' where 'variable' is the manifest variable, 1 is the factor, and ">0" is the restriction. Acceptable
+#' restrictions are ">0" or "0".
+#' @param normal.dist A character vector specifying which variables should be treated as observed 
+#' Gaussian. Defaults to none (a completely semiparametric copula model)
+#' @param center.data Center continuous variables
+#' @param scale.data  Scale continuous variables
+#' @param nsim Number of iterations past burn-in
+#' @param nburn Number of initial (burn-in) iterations to discard
+#' @param thin Keep every thin'th MCMC sample (i.e. save nsim/thin samples)
+#' @param print.status How often to print status messages to console
+#' @param keep.scores Save samples of factor scores
+#' @param keep.loadings Save samples of factor loadings
+#' @param loading.prior Specify point mass ("pointmass", default) or normal priors ("normal") 
+#' @param factor.scales Include a separate scale parameter for each factor
+#' @param px Use parameter expansion for ordinal/copula/mixed factor models (strongly recommended)
+#' @param coda Create \code{mcmc} objects to allow use of functions from the 
+#' \code{coda} package: "all" for loadings and scores, "loadings" or "scores" for one or the
+#' other, or "none" for neither
+#' @param coda.scale Put the loadings on the correlation scale when creating \code{mcmc} objects
+#' @param imh Use Independence Metropolis-Hastings step for discrete margins. If FALSE, use the 
+#' semiparametric extended rank likelihood
+#' @param imh.iter Iterations used to build IMH proposal
+#' @param imh.burn Burn-in before collecting samples used to build IMH proposal (total burn-in is nburn+imh.iter+imh.burn)
+#' @param ... Prior parameters and other (experimental) arguments (see details)
+#' @return A S3 \code{bfa} object \code{model}, with posterior samples/summaries.
+#' @export
+
+bfa_copula <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
+                center.data=TRUE, scale.data=TRUE, nsim=0, nburn=0, thin=1,
+                print.status=500, keep.scores=FALSE, keep.loadings=TRUE,
+                loading.prior="pointmass", factor.scales=FALSE, px=TRUE,
+                coda="loadings", coda.scale=TRUE, imh=FALSE, imh.iter=500,
+                imh.burn=500, ...) {
+  if (class(x)!='bfa') {
+    fr = model.frame(x, data=data, na.action=NULL)
+    d = dim(fr)
+    if(any(is.na(normal.dist))) {
+      normal.dist = rep(0, d[2])
+    }
+  }
+  .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
+       center.data=center.data, scale.data=scale.data, nsim=nsim, nburn=nburn, thin=thin,
+       print.status=print.status, keep.scores=keep.scores, keep.loadings=keep.loadings,
+       loading.prior=loading.prior, factor.scales=factor.scales, px=px, coda=coda, 
+       coda.scale=coda.scale, imh=imh, imh.iter=imh.iter, imh.burn=imh.burn, ...)
+}
+
+#' Initialize and fit a mixed-scale Gaussian factor model, with probit specifications for the discrete
+#' margins
+#'
+#' This function performs a specified number of MCMC iterations and
+#' returns an object containing summary statistics from the MCMC samples
+#' as well as the actual samples if keep.scores or keep.loadings are \code{TRUE}.
+#' Default behavior is to save only the loadings. 
+#' 
+#' Additional parameters:
+#' Prior parameters
+#' loadings.var: Factor loading prior variance
+#' tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
+#' rho.a, rho.b: Beta hyperparameters for point mass prior
+#' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
+#' gdp.alpha, gdp.beta: GDP prior parameters
+#' 
+#' @param x A formula, matrix or bfa object. 
+#' @param data The data if x is a formula
+#' @param num.factor Number of factors
+#' @param restrict A matrix or list giving restrictions on factor loadings. A matrix should be the 
+#' same size as the loadings matrix. Acceptable values are 0 (identically 0), 1 (unrestricted), 
+#' or 2 (strictly positive). List elements should be character vectors of the form c('variable',1, ">0")
+#' where 'variable' is the manifest variable, 1 is the factor, and ">0" is the restriction. Acceptable
+#' restrictions are ">0" or "0".
+#' @param normal.dist A character vector specifying which variables should be treated as observed 
+#' Gaussian. Defaults to all numeric variables if x is a formula.
+#' @param center.data Center data
+#' @param scale.data  Scale data
+#' @param nsim Number of iterations past burn-in
+#' @param nburn Number of initial (burn-in) iterations to discard
+#' @param thin Keep every thin'th MCMC sample (i.e. save nsim/thin samples)
+#' @param print.status How often to print status messages to console
+#' @param keep.scores Save samples of factor scores
+#' @param keep.loadings Save samples of factor loadings
+#' @param loading.prior Specify point mass ("pointmass", default) or normal priors ("normal") 
+#' @param factor.scales Include a separate scale parameter for each factor
+#' @param px Use parameter expansion for ordinal variables (recommended)
+#' @param coda Create \code{mcmc} objects to allow use of functions from the 
+#' \code{coda} package: "all" for loadings and scores, "loadings" or "scores" for one or the
+#' other, or "none" for neither
+#' @param coda.scale Put the loadings on the correlation scale when creating \code{mcmc} objects
+#' @param imh.iter Iterations used to build IMH proposal
+#' @param imh.burn Burn-in before collecting samples used to build IMH proposal (total burn-in is nburn+imh.iter+imh.burn)
+#' @param ... Prior parameters and other (experimental) arguments (see details)
+#' @return A S3 \code{bfa} object \code{model}, with posterior samples/summaries.
+#' @export
+
+bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
+                center.data=TRUE, scale.data=TRUE, nsim=0, nburn=0, thin=1,
+                print.status=500, keep.scores=FALSE, keep.loadings=TRUE,
+                loading.prior="pointmass", factor.scales=FALSE, px=TRUE,
+                coda="loadings", coda.scale=TRUE, imh.iter=500,
+                imh.burn=500, ...) {
+  .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
+       center.data=center.data, scale.data=scale.data, nsim=nsim, nburn=nburn, thin=thin,
+       print.status=print.status, keep.scores=keep.scores, keep.loadings=keep.loadings,
+       loading.prior=loading.prior, factor.scales=factor.scales, px=px, coda=coda, 
+       coda.scale=coda.scale, imh=TRUE, imh.iter=imh.iter, imh.burn=imh.burn, ...)
+}
+
+#' Initialize and fit a bfa model
+#'
+#' This function performs a specified number of MCMC iterations and
+#' returns an object containing summary statistics from the MCMC samples
+#' as well as the actual samples if keep.scores or keep.loadings are \code{TRUE}.
+#' Default behavior is to save only the loadings. 
+#' 
+#' Additional parameters:
+#' Prior parameters
+#' loadings.var: Factor loading prior variance
+#' tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
+#' rho.a, rho.b: Beta hyperparameters for point mass prior
+#' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
+#' gdp.alpha, gdp.beta: GDP prior parameters
+#' 
+#' @param x A formula, matrix or bfa object. 
+#' @param data The data if x is a formula
+#' @param num.factor Number of factors
+#' @param restrict A matrix or list giving restrictions on factor loadings. A matrix should be the 
+#' same size as the loadings matrix. Acceptable values are 0 (identically 0), 1 (unrestricted), 
+#' or 2 (strictly positive). List elements should be character vectors of the form c('variable',1, ">0")
+#' where 'variable' is the manifest variable, 1 is the factor, and ">0" is the restriction. Acceptable
+#' restrictions are ">0" or "0".
+#' @param normal.dist A character vector specifying which variables should be treated as observed Gaussian. Defaults to all numeric variables if x is a formula.
 #' @param center.data Center data
 #' @param scale.data  Scale data
 #' @param nsim Number of iterations past burn-in
@@ -74,9 +256,9 @@ return()
 #' @param imh.burn Burn-in before collecting samples used to build IMH proposal (total burn-in is nburn+imh.iter+imh.burn)
 #' @param ... Prior parameters and other (experimental) arguments (see details)
 #' @return A S3 \code{bfa} object \code{model}, with posterior samples/summaries.
-#' @export
+#' @rdname bfa_
 
-bfa <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
+.bfa <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
                 center.data=TRUE, scale.data=TRUE, nsim=0, nburn=0, thin=1,
                 print.status=500, keep.scores=FALSE, keep.loadings=TRUE,
                 loading.prior="pointmass", factor.scales=FALSE, px=TRUE,
@@ -90,15 +272,15 @@ bfa <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
   }
   
   if(imh) {
-    
+    print("Building proposal...")
     model = fit_bfa(model, imh.iter, imh.burn, 1, print.status,
                    keep.scores, keep.loadings, loading.prior,
-                   factor.scales, px, coda, coda.scale, save_max=TRUE, ...)
-    
+                   factor.scales, px, coda, coda.scale, save_max=TRUE, quiet=TRUE, ...)
+
     P = model$P
-    means <- vector("list", P) # create list
-    covs  <- vector("list", P) # create list
-    precs <- vector("list", P) # create list
+    means <- vector("list", P)
+    covs  <- vector("list", P)
+    precs <- vector("list", P)
     
     levs = rep(0, P)
     
@@ -126,9 +308,10 @@ bfa <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
       precs[[ind]] = prop.prec
       means[[ind]] = prop.mean
     }
+    print("Done.")
     model = fit_bfa(model, nsim, nburn, thin, print.status,
                    keep.scores, keep.loadings, loading.prior,
-                   factor.scales, px, coda, coda.scale, imh=TRUE, 
+                   factor.scales, px, coda, coda.scale, imh=1, 
                    prop.cov=covs, prop.prec=precs, prop.mean=means, 
                    nlevels=matrix(levs), df=100,  ...)
   } else {
@@ -154,7 +337,7 @@ bfa <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
 #' rho.a, rho.b: Beta hyperparameters for point mass prior
 #' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
 #' gdp.alpha, gdp.beta: GDP prior parameters
-#' '
+#' 
 #' @param model an object of type bfa, as returned by bfa(data)
 #' @param nsim number of iterations past burn-in
 #' @param nburn number of initial (burn-in) iterations to discard
@@ -238,15 +421,16 @@ fit_bfa <- function(model, nsim, nburn, thin=1, print.status=500,
   if(is.null(more_args$save_max)) more_args$save_max = 0
   if(is.null(more_args$positive)) more_args$positive = FALSE
   
+  more_args$save_max = as.numeric(more_args$save_max)
   more_args$error_var_i = model$error_var_i
 
-	model$nsim = nsim
+	model$nsim  = nsim
 	model$nburn = nburn
-	model$thin = thin
+	model$thin  = thin
 
 	sim = .MCMCstep(model$ldata, model$loadings, model$scores, model$tauinv, 
-		 model$rho, model$ranks, model$maxes, model$argsorts, model$loadings.restrict,
-		 model$priors, nsim, nburn, thin, print.status, keep.scores, keep.loadings, more_args)
+		              model$rho, model$ranks, model$maxes, model$argsorts, model$loadings.restrict,
+		              model$priors, nsim, nburn, thin, print.status, keep.scores, keep.loadings, more_args)
   
   if (keep.scores)   dim(sim$Fp)=c(K,N,nsim/thin)
   if (keep.loadings) dim(sim$Ap)=c(P,K,nsim/thin)
@@ -257,7 +441,7 @@ fit_bfa <- function(model, nsim, nburn, thin=1, print.status=500,
   dim(sim$Ap.mean) = c(P,K)
   dim(sim$Ap.var)  = c(P,K)
   dim(sim$pnz)     = c(P,K)
-	
+
   model$post.loadings.mean = sim$Ap.mean
   model$post.loadings.var  = sim$Ap.var
   model$post.loadings      = sim$Ap
@@ -270,12 +454,7 @@ fit_bfa <- function(model, nsim, nburn, thin=1, print.status=500,
   model$post.loadings.prob = 1.0-sim$pnz
   
  if (!is.null(more_args$save_max) && more_args$save_max>0) {
-    model$cutpoints.mean = sim$maxmean
-    model$cutpoints.var  = sim$maxvar
     model$post.cutpoints = sim$maxp
-    
-    dim(model$cutpoints.mean) = dim(model$maxes)
-    dim(model$cutpoints.var)  = dim(model$maxes)
  }
  
   if (coda!="none") {

@@ -38,15 +38,26 @@ utri_restrict = function(p, k) {
 bfa_model <- function(x, data=NULL, num.factor=1, restrict=NA, 
                       normal.dist=NA, center.data=TRUE, scale.data=FALSE, 
                       init=TRUE, ...) {
-  
+  more_args = list(...)
   if (is.matrix(x)) D = x
   if(is.formula(x)) {
     fr = model.frame(x, data=data, na.action=NULL)
     d = dim(fr)
+    if(any(is.na(normal.dist))) {
+      normal.dist = rep(0, d[2])
+      fillnd = TRUE
+    } else {
+      fillnd = FALSE
+    }
     D = matrix(NA, nrow=d[2], ncol=d[1])
     for (i in 1:d[2]) {
       if(class(fr[,i])[1] %in% c('ordered', 'numeric', 'integer')) {
         D[i,] = as.numeric(fr[,i])
+        if('numeric' %in% class(fr[,i]) && fillnd) {
+          normal.dist[i] = 1
+        } else {
+          if(fillnd) normal.dist[i] = 0
+        }
       } else {
         stop("Data contain variables which are not ordinal. Each variable must be an integer/numeric vector or ordered factor")
       }
@@ -146,6 +157,13 @@ bfa_model <- function(x, data=NULL, num.factor=1, restrict=NA,
       }
     }
     bfa:::.updateScores(Z, loadings, scores)
+  }
+  
+  if(any(is.null(more_args$init.fa))) more_args$init.fa=FALSE
+  if(more_args$init.fa) {
+    mf = factanal(t(Z), factors=num.factor, scores='regression', lower=0.05)
+    loadings = (1/mf$uniqueness)*matrix(mf$loadings, ncol=num.factor)
+    scores = t(mf$scores)
   }
   
   if(is.null(colnames(D))) colnames(D) = paste('Obs',1:ncol(D))

@@ -57,6 +57,8 @@ SEXP MCMCstep( SEXP Z_, SEXP A_, SEXP F_, SEXP tauinv_, SEXP rho_ ,
 	bool keeploadings = as<bool>(keeploadings_);
 	int  printstatus  = as<int>(printstatus_);
 	
+	//Rprintf("Save max? %d\n", save_max);
+	
 	if (!quiet) { 
 	  switch (method) {
 	    case 0:
