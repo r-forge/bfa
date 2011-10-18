@@ -214,12 +214,12 @@ mean.bfa <- function(x, ...) {
   return(list(loadings=x$post.loadings.mean, scores=x$post.scores.mean))
 }
 
-#' Extract posterior variances from sbfac object
-#' @param x A bfa object
-#' @param ... Ignored
-#' @method var bfa
-#' @return A list with elements loadings and scores containing MCMC variances
-#' @export
-var.bfa <- function(x, ...) {
-  return(list(loadings=x$post.loadings.var, scores=x$post.scores.var))
-}
+# Extract posterior variances from sbfac object
+# @param x A bfa object
+# @param ... Ignored
+# @method var bfa
+# @return A list with elements loadings and scores containing MCMC variances
+# @export
+#var.bfa <- function(x, ...) {
+#  return(list(loadings=x$post.loadings.var, scores=x$post.scores.var))
+#}
