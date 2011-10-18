@@ -1,4 +1,4 @@
-#' Display a heatmap of factor loadings (note that this function requires ggplot2 package)
+#' Display a heatmap of factor loadings
 #' @aliases plot_loadings
 #' @param x an sbfac model object or a (loadings) matrix
 #' @param xlabel x-axis label

@@ -1,31 +1,31 @@
-#' @nord
+# @nord
 .updateScores <- function (Z_, A_, F_) 
 .Call("updateScoresC", Z_, A_, F_, PACKAGE = "bfa")
 
-#' @nord
+# @nord
  .updateRho <- function (rho_, A_, rhoa_, rhob_) 
 .Call("updateRho", rho_, A_, rhoa_, rhob_, PACKAGE = "bfa")
 
-#' @nord
+# @nord
 #.updateSparseLoadingsJ( SEXP Z_, SEXP A_, SEXP F_, SEXP tauinv_, SEXP rho_, SEXP A_restrict_, SEXP pnz_ )
  .updateSparseLoadings <- function (Z_, A_, F_, tauinv_, rho_, A_restrict_, pnz_) 
 .Call("updateSparseLoadingsJ", Z_, A_, F_, tauinv_, rho_, A_restrict_, pnz_, PACKAGE = "bfa")
 
 #SEXP updateZ( SEXP Z_, SEXP Ra_, SEXP maxes_, SEXP argsorts_, SEXP A_, SEXP F_ ){
 
-#' @nord
+# @nord
  .updateZ <- function (Z_, Ra_, maxes_, argsorts_, A_, F_) {
 .Call("updateZ", Z_, Ra_, maxes_, argsorts_, A_, F_,  PACKAGE = "bfa")
 return()
 }
 
-#' @nord
+# @nord
 .updateZcut <- function (Z_, Ra_, maxes_, argsorts_, A_, F_) {
 .Call("updateZcut", Z_, Ra_, maxes_, argsorts_, A_, F_,  PACKAGE = "bfa")
 return()
 }
 
-#' @nord
+# @nord
 #SEXP MCMCstep( SEXP Z_, SEXP A_, SEXP F_, SEXP tauinv_, SEXP rho_ , SEXP Ra_, SEXP maxes_, SEXP argsorts_, SEXP priors_, SEXP nsim_, SEXP nburn_, SEXP thin_)
 .MCMCstep <- function (Z_, A_, F_, tauinv_, rho_, Ra_, maxes_, argsorts_, A_restrict_, priors_, nsim_, nburn_, thin_, printstatus_, keep.scores, keep.loadings, more_args)
 .Call("MCMCstep", Z_, A_, F_, tauinv_, rho_, Ra_, maxes_, argsorts_, A_restrict_, priors_, nsim_, nburn_, thin_, printstatus_, keep.scores, keep.loadings, more_args, PACKAGE = "bfa")
@@ -38,11 +38,13 @@ return()
 #' Default behavior is to save only the loadings. 
 #' 
 #' Additional parameters:
-#' Prior parameters
-#' tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions
-#' rho.a, rho.b: Beta hyperparameters for point mass prior
-#' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
-#' gdp.alpha, gdp.beta: GDP prior parameters
+#' \itemize{
+#' \item loadings.var: Factor loading prior variance
+#' \item tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
+#' \item rho.a, rho.b: Beta hyperparameters for point mass prior
+#' \item sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
+#' \item gdp.alpha, gdp.beta: GDP prior parameters
+#' }
 #' 
 #' @param x A formula, matrix or bfa object. 
 #' @param data The data if x is a formula
@@ -84,7 +86,7 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
                 
 }
 
-#' Initialize and fit a bfa model
+#' Initialize and fit a copula factor model
 #'
 #' This function performs a specified number of MCMC iterations and
 #' returns an object containing summary statistics from the MCMC samples
@@ -92,12 +94,13 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
 #' Default behavior is to save only the loadings. 
 #' 
 #' Additional parameters:
-#' Prior parameters
-#' loadings.var: Factor loading prior variance
-#' tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
-#' rho.a, rho.b: Beta hyperparameters for point mass prior
-#' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
-#' gdp.alpha, gdp.beta: GDP prior parameters
+#' \itemize{
+#' \item loadings.var: Factor loading prior variance
+#' \item tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
+#' \item rho.a, rho.b: Beta hyperparameters for point mass prior
+#' \item sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
+#' \item gdp.alpha, gdp.beta: GDP prior parameters
+#' }
 #' 
 #' @param x A formula, matrix or bfa object. 
 #' @param data The data if x is a formula
@@ -131,6 +134,19 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
 #' @param ... Prior parameters and other (experimental) arguments (see details)
 #' @return A S3 \code{bfa} object \code{model}, with posterior samples/summaries.
 #' @export
+#' @examples \dontrun{
+#' require(MASS)
+#' data(UScereal)
+#' UScereal$shelf = factor(UScereal$shelf, ordered=TRUE)
+#' UScereal$vitamins = factor(UScereal$vitamins, ordered=TRUE,
+#'                            levels=c("none", "enriched", "100%"))
+#' fit_cop = bfa_copula(~., data=UScereal[,-1], num.factor=2, nsim=5000, nburn=500, thin=2,
+#'                       normal.dist=rep(0,10), rest=list(c("sugars", 2, "0")),
+#'                       loading.prior="gdp", beta=0.2, keep.scores=T, init.fa=FALSE)
+#' plot_loadings(fit_cop)
+#' biplot(fit_cop, cex=c(0.8, 0.8))
+#' }
+
 
 bfa_copula <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
                 center.data=TRUE, scale.data=TRUE, nsim=0, nburn=0, thin=1,
@@ -161,12 +177,13 @@ bfa_copula <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
 #' Default behavior is to save only the loadings. 
 #' 
 #' Additional parameters:
-#' Prior parameters
-#' loadings.var: Factor loading prior variance
-#' tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
-#' rho.a, rho.b: Beta hyperparameters for point mass prior
-#' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
-#' gdp.alpha, gdp.beta: GDP prior parameters
+#' \itemize{
+#' \item loadings.var: Factor loading prior variance
+#' \item tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
+#' \item rho.a, rho.b: Beta hyperparameters for point mass prior
+#' \item sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
+#' \item gdp.alpha, gdp.beta: GDP prior parameters
+#' }
 #' 
 #' @param x A formula, matrix or bfa object. 
 #' @param data The data if x is a formula
@@ -211,52 +228,6 @@ bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
        loading.prior=loading.prior, factor.scales=factor.scales, px=px, coda=coda, 
        coda.scale=coda.scale, imh=TRUE, imh.iter=imh.iter, imh.burn=imh.burn, ...)
 }
-
-#' Initialize and fit a bfa model
-#'
-#' This function performs a specified number of MCMC iterations and
-#' returns an object containing summary statistics from the MCMC samples
-#' as well as the actual samples if keep.scores or keep.loadings are \code{TRUE}.
-#' Default behavior is to save only the loadings. 
-#' 
-#' Additional parameters:
-#' Prior parameters
-#' loadings.var: Factor loading prior variance
-#' tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
-#' rho.a, rho.b: Beta hyperparameters for point mass prior
-#' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
-#' gdp.alpha, gdp.beta: GDP prior parameters
-#' 
-#' @param x A formula, matrix or bfa object. 
-#' @param data The data if x is a formula
-#' @param num.factor Number of factors
-#' @param restrict A matrix or list giving restrictions on factor loadings. A matrix should be the 
-#' same size as the loadings matrix. Acceptable values are 0 (identically 0), 1 (unrestricted), 
-#' or 2 (strictly positive). List elements should be character vectors of the form c('variable',1, ">0")
-#' where 'variable' is the manifest variable, 1 is the factor, and ">0" is the restriction. Acceptable
-#' restrictions are ">0" or "0".
-#' @param normal.dist A character vector specifying which variables should be treated as observed Gaussian. Defaults to all numeric variables if x is a formula.
-#' @param center.data Center data
-#' @param scale.data  Scale data
-#' @param nsim Number of iterations past burn-in
-#' @param nburn Number of initial (burn-in) iterations to discard
-#' @param thin Keep every thin'th MCMC sample (i.e. save nsim/thin samples)
-#' @param print.status How often to print status messages to console
-#' @param keep.scores Save samples of factor scores
-#' @param keep.loadings Save samples of factor loadings
-#' @param loading.prior Specify point mass ("pointmass", default) or normal priors ("normal") 
-#' @param factor.scales Include a separate scale parameter for each factor
-#' @param px Use parameter expansion for ordinal/copula/mixed factor models (recommended)
-#' @param coda Create \code{mcmc} objects to allow use of functions from the 
-#' \code{coda} package: "all" for loadings and scores, "loadings" or "scores" for one or the
-#' other, or "none" for neither
-#' @param coda.scale Put the loadings on the correlation scale when creating \code{mcmc} objects
-#' @param imh Use Independence Metropolis-Hastings step for discrete margins
-#' @param imh.iter Iterations used to build IMH proposal
-#' @param imh.burn Burn-in before collecting samples used to build IMH proposal (total burn-in is nburn+imh.iter+imh.burn)
-#' @param ... Prior parameters and other (experimental) arguments (see details)
-#' @return A S3 \code{bfa} object \code{model}, with posterior samples/summaries.
-#' @rdname bfa_
 
 .bfa <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
                 center.data=TRUE, scale.data=TRUE, nsim=0, nburn=0, thin=1,
@@ -324,36 +295,36 @@ bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
 }
 
 
-#' Perform MCMC model fitting for a bfa model
-#'
-#' This function performs a specified number of MCMC iterations and
-#' returns an object containing summary statistics from the MCMC samples
-#' as well as the actual samples if keep.scores or keep.loadings are \code{TRUE}.
-#' Default behavior is to save only the loadings. 
-#' 
-#' Prior parameters:
-#' loadings.var: Factor loading prior variance
-#' tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
-#' rho.a, rho.b: Beta hyperparameters for point mass prior
-#' sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
-#' gdp.alpha, gdp.beta: GDP prior parameters
-#' 
-#' @param model an object of type bfa, as returned by bfa(data)
-#' @param nsim number of iterations past burn-in
-#' @param nburn number of initial (burn-in) iterations to discard
-#' @param thin keep every thin'th MCMC sample (i.e. save nsim/thin samples)
-#' @param print.status how often to print status messages to console
-#' @param keep.scores save samples of factor scores
-#' @param keep.loadings save samples of factor loadings
-#' @param loading.prior Specify point mass ("pointmass", default) or normal priors ("normal") 
-#' @param factor.scales Include a separate scale parameter for each factor
-#' @param px Use parameter expansion for ordinal/copula/mixed factor models (recommended)
-#' @param coda create \code{mcmc} objects to allow use of functions from the 
-#' \code{coda} package: "all" for loadings and scores, "loadings" or "scores" for one or the
-#' other, or "none" for neither
-#' @param coda.scale put the loadings on the correlation scale when creating \code{mcmc} objects
-#' @param ... Prior parameters and other (experimental) arguments (see details)
-#' @return The S3 \code{bfa} object \code{model}, now with posterior samples/summaries.
+# Perform MCMC model fitting for a bfa model
+#
+# This function performs a specified number of MCMC iterations and
+# returns an object containing summary statistics from the MCMC samples
+# as well as the actual samples if keep.scores or keep.loadings are \code{TRUE}.
+# Default behavior is to save only the loadings. 
+# 
+# Prior parameters:
+# loadings.var: Factor loading prior variance
+# tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
+# rho.a, rho.b: Beta hyperparameters for point mass prior
+# sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
+# gdp.alpha, gdp.beta: GDP prior parameters
+# 
+# @param model an object of type bfa, as returned by bfa(data)
+# @param nsim number of iterations past burn-in
+# @param nburn number of initial (burn-in) iterations to discard
+# @param thin keep every thin'th MCMC sample (i.e. save nsim/thin samples)
+# @param print.status how often to print status messages to console
+# @param keep.scores save samples of factor scores
+# @param keep.loadings save samples of factor loadings
+# @param loading.prior Specify point mass ("pointmass", default) or normal priors ("normal") 
+# @param factor.scales Include a separate scale parameter for each factor
+# @param px Use parameter expansion for ordinal/copula/mixed factor models (recommended)
+# @param coda create \code{mcmc} objects to allow use of functions from the 
+# \code{coda} package: "all" for loadings and scores, "loadings" or "scores" for one or the
+# other, or "none" for neither
+# @param coda.scale put the loadings on the correlation scale when creating \code{mcmc} objects
+# @param ... Prior parameters and other (experimental) arguments (see details)
+# @return The S3 \code{bfa} object \code{model}, now with posterior samples/summaries.
 
 fit_bfa <- function(model, nsim, nburn, thin=1, print.status=500,
                    keep.scores=FALSE, keep.loadings=TRUE, loading.prior="pointmass",
@@ -448,7 +419,7 @@ fit_bfa <- function(model, nsim, nburn, thin=1, print.status=500,
 	
   model$post.scores.mean   = sim$Fp.mean
   model$post.scores.var    = sim$Fp.var
-  model$post.scores        = sim$Fp
+  model$post.scores        = sim$Fp 
   
   model$post.sigma2        = 1/sim$sigma2inv
   model$post.loadings.prob = 1.0-sim$pnz
@@ -472,16 +443,16 @@ fit_bfa <- function(model, nsim, nburn, thin=1, print.status=500,
 }
 
 
-#' Imputation on the original scale of the data
-#'
-#' This function imputes data on the original scale given a current value of the latent
-#' continuous data, using the empirical cdf.
-#'
-#' @param D Observed data
-#' @param Z Latent data (standardized)
-#' @return A vector of length \code{length(D[is.na(D)])} containing the
-#' imputed values
-#' @export
+# Imputation on the original scale of the data
+#
+# This function imputes data on the original scale given a current value of the latent
+# continuous data, using the empirical cdf.
+#
+# @param D Observed data
+# @param Z Latent data (standardized)
+# @return A vector of length \code{length(D[is.na(D)])} containing the
+# imputed values
+# @export
 
 
 #impute <- function(D, Z) {
