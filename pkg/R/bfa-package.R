@@ -3,7 +3,7 @@
 #' \tabular{ll}{
 #' Package: \tab bfa\cr
 #' Type: \tab Package\cr
-#' Version: \tab 1.0\cr
+#' Version: \tab 0.1\cr
 #' Date: \tab 2011-06-03\cr
 #' License: \tab GPL-3\cr
 #' LazyLoad: \tab yes\cr

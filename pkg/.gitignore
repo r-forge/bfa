@@ -1,7 +1,10 @@
 bfa_0.1.tar.gz
 ..Rcheck/00check.log
 ..Rcheck/00install.out
+<<<<<<< HEAD
 R/postproc.R
+=======
+>>>>>>> stable
 bfa.Rcheck/00_pkg_src/bfa/.gitignore
 bfa.Rcheck/00_pkg_src/bfa/DESCRIPTION
 bfa.Rcheck/00_pkg_src/bfa/NAMESPACE
@@ -12,6 +15,10 @@ bfa.Rcheck/00_pkg_src/bfa/R/main.R
 bfa.Rcheck/00_pkg_src/bfa/R/plots.R
 bfa.Rcheck/00_pkg_src/bfa/R/postproc.R
 bfa.Rcheck/00_pkg_src/bfa/R/ratings08.R
+<<<<<<< HEAD
+=======
+bfa.Rcheck/00_pkg_src/bfa/R/rng.R
+>>>>>>> stable
 bfa.Rcheck/00_pkg_src/bfa/data/ratings08.RData
 bfa.Rcheck/00_pkg_src/bfa/example/ex-bfa_cop.R
 bfa.Rcheck/00_pkg_src/bfa/make_docs.R
@@ -25,11 +32,16 @@ bfa.Rcheck/00_pkg_src/bfa/man/corr.samp.Rd
 bfa.Rcheck/00_pkg_src/bfa/man/get_coda.Rd
 bfa.Rcheck/00_pkg_src/bfa/man/mean.bfa.Rd
 bfa.Rcheck/00_pkg_src/bfa/man/plot_loadings.Rd
+<<<<<<< HEAD
+=======
+bfa.Rcheck/00_pkg_src/bfa/man/predict.bfa.Rd
+>>>>>>> stable
 bfa.Rcheck/00_pkg_src/bfa/man/print.bfa.Rd
 bfa.Rcheck/00_pkg_src/bfa/man/ratings08.Rd
 bfa.Rcheck/00_pkg_src/bfa/man/reg.samp.Rd
 bfa.Rcheck/00_pkg_src/bfa/man/utri_restrict.Rd
 bfa.Rcheck/00_pkg_src/bfa/man/woodbury.Rd
+<<<<<<< HEAD
 bfa.Rcheck/00_pkg_src/bfa/src-i386/Makevars
 bfa.Rcheck/00_pkg_src/bfa/src-i386/Makevars.win
 bfa.Rcheck/00_pkg_src/bfa/src-i386/bfa.so
@@ -110,14 +122,51 @@ bfa.Rcheck/00_pkg_src/bfa/src/main_mcmc.cpp
 bfa.Rcheck/00_pkg_src/bfa/src/main_mcmc.h
 bfa.Rcheck/00_pkg_src/bfa/src/scores.cpp
 bfa.Rcheck/00_pkg_src/bfa/src/scores.h
+=======
+bfa.Rcheck/00_pkg_src/bfa/src/Makevars
+bfa.Rcheck/00_pkg_src/bfa/src/Makevars.win
+bfa.Rcheck/00_pkg_src/bfa/src/bfa.so
+bfa.Rcheck/00_pkg_src/bfa/src/bfa_common.cpp
+bfa.Rcheck/00_pkg_src/bfa/src/bfa_common.h
+bfa.Rcheck/00_pkg_src/bfa/src/bfa_common.o
+bfa.Rcheck/00_pkg_src/bfa/src/erl.cpp
+bfa.Rcheck/00_pkg_src/bfa/src/erl.h
+bfa.Rcheck/00_pkg_src/bfa/src/erl.o
+bfa.Rcheck/00_pkg_src/bfa/src/imh.cpp
+bfa.Rcheck/00_pkg_src/bfa/src/imh.h
+bfa.Rcheck/00_pkg_src/bfa/src/imh.o
+bfa.Rcheck/00_pkg_src/bfa/src/loadings.cpp
+bfa.Rcheck/00_pkg_src/bfa/src/loadings.h
+bfa.Rcheck/00_pkg_src/bfa/src/loadings.o
+bfa.Rcheck/00_pkg_src/bfa/src/loadings_beta.cpp
+bfa.Rcheck/00_pkg_src/bfa/src/loadings_beta.h
+bfa.Rcheck/00_pkg_src/bfa/src/loadings_beta.o
+bfa.Rcheck/00_pkg_src/bfa/src/loadings_gdp.cpp
+bfa.Rcheck/00_pkg_src/bfa/src/loadings_gdp.h
+bfa.Rcheck/00_pkg_src/bfa/src/loadings_gdp.o
+bfa.Rcheck/00_pkg_src/bfa/src/loadings_sparse.cpp
+bfa.Rcheck/00_pkg_src/bfa/src/loadings_sparse.h
+bfa.Rcheck/00_pkg_src/bfa/src/loadings_sparse.o
+bfa.Rcheck/00_pkg_src/bfa/src/main_mcmc.cpp
+bfa.Rcheck/00_pkg_src/bfa/src/main_mcmc.h
+bfa.Rcheck/00_pkg_src/bfa/src/main_mcmc.o
+bfa.Rcheck/00_pkg_src/bfa/src/scores.cpp
+bfa.Rcheck/00_pkg_src/bfa/src/scores.h
+bfa.Rcheck/00_pkg_src/bfa/src/scores.o
+>>>>>>> stable
 bfa.Rcheck/00_pkg_src/bfa/test.R
 bfa.Rcheck/00check.log
 bfa.Rcheck/00install.out
 bfa.Rcheck/Rdlatex.log
 bfa.Rcheck/bfa-Ex.R
+<<<<<<< HEAD
 bfa.Rcheck/bfa-Ex.ps
 bfa.Rcheck/bfa-Ex_i386.Rout
 bfa.Rcheck/bfa-Ex_x86_64.Rout
+=======
+bfa.Rcheck/bfa-Ex.Rout
+bfa.Rcheck/bfa-Ex.ps
+>>>>>>> stable
 bfa.Rcheck/bfa-manual.log
 bfa.Rcheck/bfa-manual.pdf
 bfa.Rcheck/bfa/DESCRIPTION
@@ -140,6 +189,7 @@ bfa.Rcheck/bfa/help/bfa.rdx
 bfa.Rcheck/bfa/help/paths.rds
 bfa.Rcheck/bfa/html/00Index.html
 bfa.Rcheck/bfa/html/R.css
+<<<<<<< HEAD
 bfa.Rcheck/bfa/libs/i386/bfa.so
 bfa.Rcheck/bfa/libs/x86_64/bfa.so
 example/ex-bfa_cop.R
@@ -149,3 +199,6 @@ man/bfa_mixed.Rd
 man/corr.samp.Rd
 man/reg.samp.Rd
 man/woodbury.Rd
+=======
+bfa.Rcheck/bfa/libs/x86_64/bfa.so
+>>>>>>> stable

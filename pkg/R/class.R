@@ -173,6 +173,8 @@ bfa_model <- function(x, data=NULL, num.factor=1, restrict=NA,
 				argsorts=argsorts, P = dim(D)[1], N = dim(D)[2], K=num.factor,
 				obslabel=colnames(D), varlabel=rownames(D),
 				nsim=0, nburn=0, thin=1, 
+				
+				original.data=data,
         
         loadings = loadings,
         post.loadings.mean = matrix(rep(0,k*p), ncol=k), 

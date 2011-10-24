@@ -1,6 +1,10 @@
 \name{plot_loadings}
 \alias{plot_loadings}
+<<<<<<< HEAD
 \title{Display a heatmap of factor loadings (note that this function requires ggplot2 package)}
+=======
+\title{Display a heatmap of factor loadings}
+>>>>>>> stable
 \usage{
   plot_loadings(x, xlabel = NA, ylabel = NA, color = NA,
   sorting = NA, scale.name = "Loading", type = "color")
@@ -24,7 +28,11 @@
   \item{scale.name}{label for the legend}
 }
 \description{
+<<<<<<< HEAD
   Display a heatmap of factor loadings (note that this
   function requires ggplot2 package)
+=======
+  Display a heatmap of factor loadings
+>>>>>>> stable
 }
 
