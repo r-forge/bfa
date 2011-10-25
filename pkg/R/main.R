@@ -78,20 +78,13 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
   fr = model.frame(x, data=data, na.action=NULL)
   d = dim(fr)
   normal.dist = rep(1, d[2])
-<<<<<<< HEAD
-  .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
-=======
   m = .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
->>>>>>> stable
        center.data=center.data, scale.data=scale.data, nsim=nsim, nburn=nburn, thin=thin,
        print.status=print.status, keep.scores=keep.scores, keep.loadings=keep.loadings,
        loading.prior=loading.prior, factor.scales=TRUE, px=FALSE, coda=coda, 
        imh=FALSE, ...) 
-<<<<<<< HEAD
-=======
   attr(m, "type") <- "gauss"
   return(m)
->>>>>>> stable
                 
 }
 
@@ -170,20 +163,13 @@ bfa_copula <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
       normal.dist = rep(0, d[2])
     }
   }
-<<<<<<< HEAD
-  .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
-=======
   m = .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
->>>>>>> stable
        center.data=center.data, scale.data=scale.data, nsim=nsim, nburn=nburn, thin=thin,
        print.status=print.status, keep.scores=keep.scores, keep.loadings=keep.loadings,
        loading.prior=loading.prior, factor.scales=factor.scales, px=px, coda=coda, 
        coda.scale=coda.scale, imh=imh, imh.iter=imh.iter, imh.burn=imh.burn, ...)
-<<<<<<< HEAD
-=======
   attr(m, "type") <- "copula"
   return(m)
->>>>>>> stable
 }
 
 #' Initialize and fit a mixed-scale Gaussian factor model, with probit specifications for the discrete
@@ -245,11 +231,8 @@ bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
        print.status=print.status, keep.scores=keep.scores, keep.loadings=keep.loadings,
        loading.prior=loading.prior, factor.scales=factor.scales, px=px, coda=coda, 
        coda.scale=coda.scale, imh=TRUE, imh.iter=imh.iter, imh.burn=imh.burn, ...)
-<<<<<<< HEAD
-=======
   attr(m, "type") <- "mixed"
   return(m)
->>>>>>> stable
 }
 
 .bfa <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
