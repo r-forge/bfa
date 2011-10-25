@@ -1,7 +1,9 @@
 library(roxygen2)
-setwd('~/Dropbox/')
-f = paste('~/Dropbox/bfa/man/',list.files('~/Dropbox/bfa/man/'), sep='')
+dir='~/Documents/svn/bfa'
+setwd(dir)
+
+f = paste('~/Documents/svn/bfa/pkg/man/',list.files('~/Documents/svn/bfa/pkg/man/'), sep='')
 lapply(f, unlink)
 
-roxygenize('bfa', 'bfa', copy.package=FALSE, overwrite=TRUE, 
+roxygenize('pkg', 'pkg', copy.package=FALSE, overwrite=TRUE, 
            unlink.target=TRUE)
