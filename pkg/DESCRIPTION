@@ -29,9 +29,6 @@ Collate:
     'get_coda.R'
     'main.R'
     'plots.R'
-<<<<<<< HEAD
-=======
     'rng.R'
->>>>>>> stable
     'postproc.R'
     'ratings08.R'

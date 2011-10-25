@@ -1,9 +1,6 @@
 S3method(biplot,bfa)
 S3method(mean,bfa)
-<<<<<<< HEAD
-=======
 S3method(predict,bfa)
->>>>>>> stable
 S3method(print,bfa)
 export(bfa_copula)
 export(bfa_gauss)
