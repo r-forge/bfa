@@ -1,29 +1,11 @@
-<<<<<<< HEAD
-=======
 #' @include rng.R
 NULL
->>>>>>> stable
 #' Invert the matrix lam*t(lam)+diag(u) via Woodbury identity
 #' @param lam p by k matrix
 #' @param u p dimensional vector
 #' @export
 woodbury = function(lam, u) {
   k = ncol(lam)
-<<<<<<< HEAD
-  if(is.null(k)) { k=1; lam=matrix(lam, nrow=length(lam)) }
-  Ui = diag(1/u)
-  if(k==1) {
-    out = Ui - Ui %*% lam  %*% t(lam) %*% Ui/c(1+ t(lam) %*% Ui %*% lam)
-  } else {
-    out = Ui - Ui %*% lam %*% solve(diag(1, k)+t(lam) %*% Ui %*% lam) %*% t(lam) %*% Ui
-  }
-  return(out)
-}
-
-#' Compute ``regression coefficients" for variable (index) against the rest
-#' @param model \code{bfa} model object
-#' @param index index of the response variable
-=======
   if(is.null(k)) { 
     k=1 
     lam=matrix(lam, nrow=length(u)) 
@@ -39,7 +21,6 @@ woodbury = function(lam, u) {
 #' Compute regression coefficients for variables in (index) against the rest
 #' @param model \code{bfa} model object
 #' @param index index(es) of the response 
->>>>>>> stable
 #' @export
 reg.samp = function(model, index = c(1)) {
   pl = model$post.loadings
@@ -47,13 +28,7 @@ reg.samp = function(model, index = c(1)) {
   out = array(NA, dim=c(length(index),model$P-length(index),ns))
   dimnames(out) = list(model$varlabel[index], model$varlabel[-index], NULL)
   for(i in 1:ns) {
-<<<<<<< HEAD
-    u = 1/(1 + rowSums(pl[, , i]^2))
-    pl[, , i]  = pl[, , i]*sqrt(u)
-    mat = t(pl[-index, , i])%*%woodbury(pl[-index, , i], u[-index])
-    out[,,i] = pl[index,,i]%*%mat
-=======
-    if(attr(m, "type") == "gauss") {
+    if(attr(model, "type") == "gauss") {
       u = model$post.sigma2[i,]
     } else {
       u = 1/(1 + rowSums(pl[, , i]^2))
@@ -61,7 +36,6 @@ reg.samp = function(model, index = c(1)) {
     }
     mat = t(pl[-index, , i])%*%woodbury(pl[-index, , i], u[-index])
     out[, , i] = pl[index, , i]%*%mat
->>>>>>> stable
   }
   return(out)
 }
@@ -80,8 +54,6 @@ corr.samp = function(model) {
     out[, , i] = pl[, , i]%*%t(pl[, , i])+diag(u)
   }
   return(out)
-<<<<<<< HEAD
-=======
 }
 
 #' Posterior predictive and univariate conditional posterior predictive distributions
@@ -167,5 +139,4 @@ predict.bfa = function(object, resp.var=NA, cond.vars=NA,
     }
   }
   return(y.samp)
->>>>>>> stable
 }
