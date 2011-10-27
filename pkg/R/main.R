@@ -226,7 +226,7 @@ bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
                 loading.prior="pointmass", factor.scales=FALSE, px=TRUE,
                 coda="loadings", coda.scale=TRUE, imh.iter=500,
                 imh.burn=500, ...) {
-  .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
+  m = .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
        center.data=center.data, scale.data=scale.data, nsim=nsim, nburn=nburn, thin=thin,
        print.status=print.status, keep.scores=keep.scores, keep.loadings=keep.loadings,
        loading.prior=loading.prior, factor.scales=factor.scales, px=px, coda=coda, 
