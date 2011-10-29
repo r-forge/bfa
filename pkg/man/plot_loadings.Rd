@@ -1,29 +1,31 @@
 \name{plot_loadings}
 \alias{plot_loadings}
-\title{Display a heatmap of factor loadings}
+\title{Plots of factor loadings}
 \usage{
-  plot_loadings(x, xlabel = NA, ylabel = NA, color = NA,
-  sorting = NA, scale.name = "Loading", type = "color")
+  plot_loadings(x, type = "heatmap", sort_order = NA, color
+  = NA, scale_name = "Loading", prob = 0.95)
 }
 \arguments{
-  \item{x}{an sbfac model object or a (loadings) matrix}
+  \item{x}{a bfa model object or a (loadings) matrix}
 
-  \item{xlabel}{x-axis label}
+  \item{type}{either "heatmap" or "credint" (HPD
+  intervals)}
 
-  \item{ylabel}{y-axis label}
+  \item{sort_order}{a permutaion of 1:P (where P is the
+  number of variables) providing sort order for the
+  variables (default is alphabetic)}
 
   \item{color}{character vector of colors (default
-  Bl-Wh-Rd)}
+  Bl-Wh-Rd) (for heatmap)}
 
-  \item{sorting}{a permutaion of 1:P (where P is the number
-  of variables) providing sort order}
+  \item{scale_name}{label for the legend (for heatmap)}
 
-  \item{type}{Either "color" (heatmap) or "line" (B&W
-  alternative) for the rows of the loadings matrix}
-
-  \item{scale.name}{label for the legend}
+  \item{prob}{probability content of HPD interval}
+}
+\value{
+  a ggplot2 object
 }
 \description{
-  Display a heatmap of factor loadings
+  Plots of factor loadings
 }
 

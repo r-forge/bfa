@@ -1,16 +1,21 @@
 \name{reg.samp}
 \alias{reg.samp}
-\title{Compute regression coefficients for variables in (index) against the rest}
+\title{Compute samples of regression coefficients}
 \usage{
-  reg.samp(model, index = c(1))
+  reg.samp(model, resp.var)
 }
 \arguments{
   \item{model}{\code{bfa} model object}
 
-  \item{index}{index(es) of the response}
+  \item{resp.var}{A character vector giving the name(s) of
+  the response}
+}
+\value{
+  An array of dimension length(index) x p-length(index) x
+  (no. of mcmc samples) with posterior samples of
+  regression coefficients
 }
 \description{
-  Compute regression coefficients for variables in (index)
-  against the rest
+  Compute samples of regression coefficients
 }
 

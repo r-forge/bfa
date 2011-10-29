@@ -77,7 +77,7 @@ margins}
   arguments (see details)}
 }
 \value{
-  A S3 \code{bfa} object \code{model}, with posterior
+  An S3 \code{bfa} object \code{model}, with posterior
   samples/summaries.
 }
 \description{

@@ -9,6 +9,9 @@
 
   \item{u}{p dimensional vector}
 }
+\value{
+  The matrix inverse
+}
 \description{
   Invert the matrix lam*t(lam)+diag(u) via Woodbury
   identity

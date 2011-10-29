@@ -2,7 +2,9 @@
 \alias{predict.bfa}
 \title{Posterior predictive and univariate conditional posterior predictive distributions
 Posterior predictive and univariate conditional posterior predictive distributions, currently
-implemented only for factor copula models}
+implemented only for copula models. If resp.var is not NA, returns an estimate of the conditional
+cdf at every observed data point for each MCMC iterate. If resp.var is NA, returns draws from the
+joint posterior predictive.}
 \usage{
   \method{predict}{bfa} (object, resp.var = NA, cond.vars =
   NA, numeric.as.factor = TRUE, ...)
@@ -10,9 +12,9 @@ implemented only for factor copula models}
 \arguments{
   \item{object}{\code{bfa} model object}
 
-  \item{resp.var}{Response variable (see details). If NA,
-  return draws from the joint posterior predictive.
-  Otherwise}
+  \item{resp.var}{Either a character vector (length 1) with
+  name of the response variable for conditional, or NA for
+  draws from the joint posterior predictive.}
 
   \item{cond.vars}{Conditioning variables; either a list
   like list(X1=val1, X2=val2) with X1, X2 variables in the
@@ -25,11 +27,19 @@ implemented only for factor copula models}
 
   \item{...}{Ignored}
 }
+\value{
+  A matrix where each row is either a sample of the
+  conditional posterior predictive cdf at each datapoint,
+  or a single sample from the joint posterior predictive.
+}
 \description{
   Posterior predictive and univariate conditional posterior
   predictive distributions Posterior predictive and
   univariate conditional posterior predictive
-  distributions, currently implemented only for factor
-  copula models
+  distributions, currently implemented only for copula
+  models. If resp.var is not NA, returns an estimate of the
+  conditional cdf at every observed data point for each
+  MCMC iterate. If resp.var is NA, returns draws from the
+  joint posterior predictive.
 }
 
