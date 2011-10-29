@@ -6,13 +6,11 @@ LinkingTo: Rcpp, RcppArmadillo
 Type: Package
 LazyLoad: yes
 Author: Jared Murray
-Description: This package provides model fitting for
-    several Bayesian factor models including Gaussian,
-    ordinal probit, mixed and semiparametric copula factor
-    models. Normal, continuous shrinkage and point-mass
-    sparsity priors for factor loadings are available.
-    Currently only exploratory factor models are
-    implemented.
+Description: This package provides model fitting for several Bayesian 
+factor models including Gaussian, ordinal probit, mixed and 
+semiparametric Gaussian copula factor models. Normal, generalized double 
+Pareto and point-mass sparsity priors for factor loadings 
+are available.
 SystemRequirements: GNU make
 Version: 0.2
 Date: 2011-10-26
