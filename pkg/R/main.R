@@ -73,8 +73,9 @@ return()
 bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA, 
                 center.data=TRUE, scale.data=TRUE, nsim=0, nburn=0, thin=1,
                 print.status=500, keep.scores=FALSE, keep.loadings=TRUE,
-                loading.prior="pointmass", 
+                loading.prior=c("gdp", "pointmass", "normal"), 
                 coda="loadings", ...) {
+  loading.prior = match.arg(loading.prior)
   fr = model.frame(x, data=data, na.action=NULL)
   d = dim(fr)
   normal.dist = rep(1, d[2])
@@ -156,9 +157,11 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
 bfa_copula <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
                 center.data=TRUE, scale.data=TRUE, nsim=0, nburn=0, thin=1,
                 print.status=500, keep.scores=FALSE, keep.loadings=TRUE,
-                loading.prior="pointmass", factor.scales=FALSE, px=TRUE,
+                loading.prior=c("gdp", "pointmass", "normal"), 
+                factor.scales=FALSE, px=TRUE,
                 coda="loadings", coda.scale=TRUE, imh=FALSE, imh.iter=500,
                 imh.burn=500, ...) {
+  loading.prior = match.arg(loading.prior)
   if (class(x)!='bfa') {
     fr = model.frame(x, data=data, na.action=NULL)
     d = dim(fr)
@@ -226,9 +229,11 @@ bfa_copula <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
 bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
                 center.data=TRUE, scale.data=TRUE, nsim=0, nburn=0, thin=1,
                 print.status=500, keep.scores=FALSE, keep.loadings=TRUE,
-                loading.prior="pointmass", factor.scales=FALSE, px=TRUE,
+                loading.prior=c("gdp", "pointmass", "normal"), 
+                factor.scales=FALSE, px=TRUE,
                 coda="loadings", coda.scale=TRUE, imh.iter=500,
                 imh.burn=500, ...) {
+  loading.prior = match.arg(loading.prior)
   m = .bfa(x, data=data, num.factor=num.factor, restrict=restrict, normal.dist=normal.dist, 
        center.data=center.data, scale.data=scale.data, nsim=nsim, nburn=nburn, thin=thin,
        print.status=print.status, keep.scores=keep.scores, keep.loadings=keep.loadings,
@@ -288,7 +293,7 @@ bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
       precs[[ind]] = prop.prec
       means[[ind]] = prop.mean
     }
-    cat("Done.")
+    cat("Done.\n")
     model = fit_bfa(model, nsim, nburn, thin, print.status,
                    keep.scores, keep.loadings, loading.prior,
                    factor.scales, px, coda, coda.scale, imh=1, 
