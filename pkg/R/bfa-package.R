@@ -16,6 +16,7 @@
 #' 
 #' @name bfa-package
 #' @docType package
+#' @import coda
 #' @title Bayesian Factor Analysis
 #' @author Jared Murray \email{jared.murray@@stat.duke.edu}
 #' @keywords package

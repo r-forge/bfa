@@ -21,6 +21,8 @@ Depends:
     RcppArmadillo,
     ggplot2,
     coda
+Imports:
+    coda
 Collate:
     'bfa-package.R'
     'class.R'
