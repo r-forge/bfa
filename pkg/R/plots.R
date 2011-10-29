@@ -11,9 +11,10 @@ NULL
 #' @return a ggplot2 object
 #' @export
 
-plot_loadings <- function(x, type="heatmap", sort_order=NA, color=NA, scale_name="Loading", 
+plot_loadings <- function(x, type=c("heatmap", "credint"), sort_order=NA, color=NA, scale_name="Loading", 
                           prob=0.95) {
-  if(match.arg(type, choices=c("heatmap", "confint"))) {
+  type = match.arg(type)
+  if(type=="heatmap") {
     m = loadings_heat(x, color=color, sort_order=sort_order, scale_name=scale_name)
   } else {
     m = loadings_ci(x, prob=prob, sort_order=sort_order)
@@ -50,14 +51,12 @@ loadings_heat <- function(x, color=NA, sort_order=NA, scale_name="Loading") {
   if (!any(is.na(sort_order))) ldf$Group = factor(ldf$Group, levels=rownames(loadings)[sort_order])
   ldf$Factor = as.factor(ldf$Factor)
   
-  if (type=="color") {
 	breaks = seq(-1,1,by = 0.2)
 	cl = colorRampPalette(color)(21)
-  	lim = c(-1.0, 1)
-  	p = ggplot(ldf, aes(x=Factor, y=Group, fill=value))
-  	p = p + scale_fill_gradientn(scale_name, colour=cl, limits = lim, breaks=breaks) 
-    p = p + geom_tile()
-  }
+  lim = c(-1.0, 1)
+  p = ggplot(ldf, aes(x=Factor, y=Group, fill=value))
+  p = p + scale_fill_gradientn(scale_name, colour=cl, limits = lim, breaks=breaks) 
+  p = p + geom_tile()
   
   p = p+ ylab("Variable")+xlab("Factor")
   return(p)
