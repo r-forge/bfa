@@ -11,11 +11,13 @@ woodbury = function(lam, u) {
     k=1 
     lam=matrix(lam, nrow=length(u)) 
   }
-  Ui = diag(1/u)
-  
-  M = diag(1, k)+t(lam) %*% Ui %*% lam
-  out = Ui - Ui %*% lam %*% solve(M, t(lam)) %*% Ui
-  
+  if(length(u)==1) {
+    out = 1/(lam%*%t(lam)+1/u)
+  } else {
+    Ui = diag(1/u)
+    M = diag(1, k)+t(lam) %*% Ui %*% lam
+    out = Ui - Ui %*% lam %*% solve(M, t(lam)) %*% Ui
+  }
   return(out)
 }
 
@@ -76,6 +78,7 @@ cov.samp = function(model) {
 }
 
 #' Posterior predictive and univariate conditional posterior predictive distributions
+#' 
 #' Posterior predictive and univariate conditional posterior predictive distributions, currently
 #' implemented only for copula models. If resp.var is not NA, returns an estimate of the conditional
 #' cdf at every observed data point for each MCMC iterate. If resp.var is NA, returns draws from the
@@ -92,7 +95,6 @@ cov.samp = function(model) {
 #' cdf at each datapoint, or a single sample from the joint posterior predictive.
 #' @method predict bfa
 #' @export
-
 predict.bfa = function(object, resp.var=NA, cond.vars=NA, numeric.as.factor=TRUE, ...) {
   mtype = attr(object, "type")
   if(mtype!="copula") stop("Prediction only available for copula models (see also ?reg.coef)")
@@ -113,9 +115,11 @@ predict.bfa = function(object, resp.var=NA, cond.vars=NA, numeric.as.factor=TRUE
     ji=1
     for(j in x.idx) {
       if(is.factor(object$original.data[,j]) || numeric.as.factor) {
-        cv = as.numeric(factor(cond.vars[[ji]], levels=levels(object$original.data[,j])))
+        cv = as.numeric(factor(cond.vars[[ji]], 
+                        levels=sort(unique(object$original.data[,j]))))
         f = ecdf(object$original.data[,j])
-        lo[ji] = qnorm(f(cv-1)); hi[ji] = qnorm(f(cv))
+        lo[ji] = qnorm(f(cv-1))
+        hi[ji] = qnorm(f(cv))
       } else {
         f = ecdf(object$original.data[,j])
         u = f(cond.vars[[ji]])
@@ -135,14 +139,15 @@ predict.bfa = function(object, resp.var=NA, cond.vars=NA, numeric.as.factor=TRUE
       k = ncol(A)
       eta = rnorm(k)
       xs = matrix(rnorm(length(x.idx)), ncol=1)
+      Ax = matrix(A[x.idx,], nrow=length(x.idx))
       for(h in 1:length(x.idx)) {
         j = x.idx[h]
         xs[h] = rtnorm(lo[h], hi[h], crossprod(A[j,], eta), sqrt(u[j]))
       }
-      miv = woodbury(A[x.idx,], u[x.idx])
-      rc = tcrossprod(A[y.idx[1],], A[x.idx,])%*%miv
+      miv = woodbury(Ax, u[x.idx])
+      rc = tcrossprod(A[y.idx[1],], Ax)%*%miv
       mu.y = rc%*%xs
-      var.y = 1-A[y.idx[1],] %*% t(A[x.idx,]) %*% miv %*% A[x.idx,]%*% matrix(A[y.idx[1],],nrow=k)
+      var.y = 1-A[y.idx[1],] %*% t(Ax) %*% miv %*% Ax %*% matrix(A[y.idx[1],],nrow=k)
       y.samp[i,] = pnorm(y.cutpts, mu.y, sqrt(var.y))
     }
   } else {
