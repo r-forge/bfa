@@ -27,7 +27,7 @@ woodbury = function(lam, u) {
 #' @return An array of dimension length(index) x p-length(index) x (no. of mcmc samples) with 
 #' posterior samples of regression coefficients
 #' @export
-reg.samp = function(model, resp.var) {
+reg_samp = function(model, resp.var) {
   index = which(resp.var %in% colnames(model$original.data))
   pl = model$post.loadings
   ns = dim(pl)[3]
@@ -50,7 +50,7 @@ reg.samp = function(model, resp.var) {
 #' @param model \code{bfa} model object
 #' @return A p x p x (no. of mcmc samples) array containing samples of the correlation matrix
 #' @export
-corr.samp = function(model) {
+corr_samp = function(model) {
   pl=model$post.loadings
   ns = dim(pl)[3]
   out = array(NA, dim=c(model$P, model$P, ns))
@@ -67,7 +67,7 @@ corr.samp = function(model) {
 #' @param model \code{bfa} model object
 #' @return A p x p x (no. of mcmc samples) array containing samples of the covariance matrix
 #' @export
-cov.samp = function(model) {
+cov_samp = function(model) {
   pl=model$post.loadings
   ns = dim(pl)[3]
   out = array(NA, dim=c(model$P, model$P, ns))
