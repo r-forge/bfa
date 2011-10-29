@@ -67,7 +67,7 @@ return()
 #' \code{coda} package: "all" for loadings and scores, "loadings" or "scores" for one or the
 #' other, or "none" for neither
 #' @param ... Prior parameters and other (experimental) arguments (see details)
-#' @return An S3 \code{bfa} object \code{model}, with posterior samples/summaries.
+#' @return A \code{bfa} object with posterior samples.
 #' @export
 
 bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA, 
@@ -101,7 +101,6 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
 #' \item loadings.var: Factor loading prior variance
 #' \item tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
 #' \item rho.a, rho.b: Beta hyperparameters for point mass prior
-#' \item sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
 #' \item gdp.alpha, gdp.beta: GDP prior parameters
 #' }
 #' 
@@ -135,7 +134,7 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
 #' @param imh.iter Iterations used to build IMH proposal
 #' @param imh.burn Burn-in before collecting samples used to build IMH proposal (total burn-in is nburn+imh.iter+imh.burn)
 #' @param ... Prior parameters and other (experimental) arguments (see details)
-#' @return An S3 \code{bfa} object \code{model}, with posterior samples/summaries.
+#' @return A \code{bfa} object with posterior samples.
 #' @export
 #' @examples \dontrun{
 #' require(MASS)
@@ -143,14 +142,46 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
 #' UScereal$shelf = factor(UScereal$shelf, ordered=TRUE)
 #' UScereal$vitamins = factor(UScereal$vitamins, ordered=TRUE,
 #'                            levels=c("none", "enriched", "100%"))
-#' fit_cop = bfa_copula(~., data=UScereal[,-1], num.factor=2, nsim=5000, nburn=500, thin=2,
-#'                       normal.dist=rep(0,10), rest=list(c("sugars", 2, "0")),
-#'                       loading.prior="gdp", keep.scores=T, init.fa=FALSE)
-#' plot_loadings(fit_cop)
-#' biplot(fit_cop, cex=c(0.8, 0.8))
-#' plot(get_coda(fit_cop))
-#' plot(get_coda(fit_cop, loadings=F, scores=T))
-#' HPDinterval(fit_cop)
+#' obj = bfa_copula(~., data=UScereal[,-1], num.factor=2, nsim=10000, nburn=1000, thin=4,
+#'                      rest=list(c("sugars", 2, "0")), loading.prior="gdp", keep.scores=T, 
+#'                      print.status=2500)
+#' plot_loadings(obj)
+#' #plot_loadings returns ggplot objects you can tweak
+#' m = plot_loadings(obj, type='credint')
+#' print(m)
+#' print(m+opts(title="HPD intervals (p=0.95)")+theme_bw())
+#' biplot(obj, cex=c(0.8, 0.8))
+#' plot(get_coda(obj)) 
+#' plot(get_coda(obj, loadings=F, scores=T))
+#' hpd.int = HPDinterval(obj, scores=T)
+#' 
+#' #sample from posterior predictive
+#' ps = predict(obj)
+#' 
+#' m=ggplot(UScereal, aes(x=calories, y=sugars))+geom_point(position='jitter', alpha=0.5)
+#' m=m+stat_density2d(data=ps, aes(x=calories, y=sugars, color = ..level..), geom='contour')
+#' print(m)
+#' 
+#' m=ggplot(UScereal, aes(x=calories))+geom_histogram()
+#' m=m+stat_density(data=ps, aes(x=calories, y=..count..), color='red',fill=NA, adjust=1.3)
+#' m=m+facet_grid(shelf~.)
+#' print(m)
+#' 
+#' #we can compute conditional dist'n estimates directly as well by supplying cond.vars
+#' cond.vars=list(shelf=1)
+#' out = predict(obj, resp.var="calories", cond.vars=cond.vars)
+#' plot(sort(unique(UScereal$calories)), apply(out, 2,mean), type='s')
+#' lines(sort(unique(UScereal$calories)), apply(out, 2, quantile, 0.05), type='s', lty=2)
+#' lines(sort(unique(UScereal$calories)), apply(out, 2,quantile, 0.95), type='s', lt=2)
+#' lines(ecdf(UScereal$calories[UScereal$shelf==1]), col='blue')
+#' text(400, 0.1, paste("n =", sum(UScereal$shelf==1)))
+#' 
+#' out2 = predict(obj, resp.var="calories", cond.vars=list(shelf=2))
+#' out3 = predict(obj, resp.var="calories", cond.vars=list(shelf=3))
+#' plot(sort(unique(UScereal$calories)), apply(out, 2,mean), type='s')
+#' lines(sort(unique(UScereal$calories)), apply(out2, 2,mean), type='s', lty=2)
+#' lines(sort(unique(UScereal$calories)), apply(out3, 2,mean), type='s', lty=3)
+
 #' }
 
 
@@ -191,7 +222,7 @@ bfa_copula <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
 #' \item loadings.var: Factor loading prior variance
 #' \item tau.a, tau.b: Gamma hyperparameters (scale=1/b) for factor precisions (if factor.scales=T)
 #' \item rho.a, rho.b: Beta hyperparameters for point mass prior
-#' \item sigma2.a, sigma2.b: Gamma hyperparameters for error precisions
+#' \item sigma2.a, sigma2.b: Gamma hyperparameters for error precisions (for numeric variables)
 #' \item gdp.alpha, gdp.beta: GDP prior parameters
 #' }
 #' 
@@ -223,7 +254,7 @@ bfa_copula <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
 #' @param imh.iter Iterations used to build IMH proposal
 #' @param imh.burn Burn-in before collecting samples used to build IMH proposal (total burn-in is nburn+imh.iter+imh.burn)
 #' @param ... Prior parameters and other (experimental) arguments (see details)
-#' @return An S3 \code{bfa} object \code{model}, with posterior samples/summaries.
+#' @return A \code{bfa} object with posterior samples.
 #' @export
 
 bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
