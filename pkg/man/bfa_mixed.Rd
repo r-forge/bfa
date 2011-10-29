@@ -77,8 +77,7 @@ margins}
   arguments (see details)}
 }
 \value{
-  An S3 \code{bfa} object \code{model}, with posterior
-  samples/summaries.
+  A \code{bfa} object with posterior samples.
 }
 \description{
   This function performs a specified number of MCMC
@@ -93,7 +92,8 @@ margins}
   hyperparameters (scale=1/b) for factor precisions (if
   factor.scales=T) \item rho.a, rho.b: Beta hyperparameters
   for point mass prior \item sigma2.a, sigma2.b: Gamma
-  hyperparameters for error precisions \item gdp.alpha,
-  gdp.beta: GDP prior parameters }
+  hyperparameters for error precisions (for numeric
+  variables) \item gdp.alpha, gdp.beta: GDP prior
+  parameters }
 }
 

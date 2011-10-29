@@ -55,8 +55,7 @@
   arguments (see details)}
 }
 \value{
-  An S3 \code{bfa} object \code{model}, with posterior
-  samples/summaries.
+  A \code{bfa} object with posterior samples.
 }
 \description{
   This function performs a specified number of MCMC
