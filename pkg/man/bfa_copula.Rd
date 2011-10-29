@@ -6,9 +6,9 @@
   normal.dist = NA, center.data = TRUE, scale.data = TRUE,
   nsim = 0, nburn = 0, thin = 1, print.status = 500,
   keep.scores = FALSE, keep.loadings = TRUE, loading.prior
-  = "pointmass", factor.scales = FALSE, px = TRUE, coda =
-  "loadings", coda.scale = TRUE, imh = FALSE, imh.iter =
-  500, imh.burn = 500, ...)
+  = c("gdp", "pointmass", "normal"), factor.scales = FALSE,
+  px = TRUE, coda = "loadings", coda.scale = TRUE, imh =
+  FALSE, imh.iter = 500, imh.burn = 500, ...)
 }
 \arguments{
   \item{x}{A formula, matrix or bfa object.}
