@@ -1,17 +1,39 @@
-#' Display a heatmap of factor loadings
-#' @aliases plot_loadings
-#' @param x an sbfac model object or a (loadings) matrix
-#' @param xlabel x-axis label
-#' @param ylabel y-axis label
-#' @param color character vector of colors (default Bl-Wh-Rd)
-#' @param sorting a permutaion of 1:P (where P is the number of variables) providing sort order
-#' @param type Either "color" (heatmap) or "line" (B&W alternative)
-#' for the rows of the loadings matrix
-#' @param scale.name label for the legend
+#' @include class.R
+NULL
+#' Plots of factor loadings
+#' @param x a bfa model object or a (loadings) matrix
+#' @param type either "heatmap" or "credint" (HPD intervals)
+#' @param sort_order a permutaion of 1:P (where P is the number of variables) providing sort order
+#' for the variables (default is alphabetic)
+#' @param color character vector of colors (default Bl-Wh-Rd) (for heatmap)
+#' @param scale_name label for the legend (for heatmap)
+#' @param prob probability content of HPD interval
+#' @return a ggplot2 object
 #' @export
 
-plot_loadings <- function(x, xlabel=NA, ylabel=NA, 
-                    color=NA, sorting=NA, scale.name="Loading", type="color") {
+plot_loadings <- function(x, type="heatmap", sort_order=NA, color=NA, scale_name="Loading", 
+                          prob=0.95) {
+  if(match.arg(type, choices=c("heatmap", "confint"))) {
+    m = loadings_heat(x, color=color, sort_order=sort_order, scale_name=scale_name)
+  } else {
+    m = loadings_ci(x, prob=prob, sort_order=sort_order)
+  }
+  return(m)
+}
+
+# Display a heatmap of factor loadings
+# @aliases loadings_heat
+# @param x a bfa model object or a (loadings) matrix
+# @param xlabel x-axis label
+# @param ylabel y-axis label
+# @param color character vector of colors (default Bl-Wh-Rd)
+# @param sort_order a permutaion of 1:P (where P is the number of variables) providing sort order
+# for the rows of the loadings matrix
+# @param scale_name label for the legend
+# @return a ggplot2 object
+# @export
+
+loadings_heat <- function(x, color=NA, sort_order=NA, scale_name="Loading") {
   if (class(x)=="bfa") {
     loadings = x$post.loadings.mean
     rownames(loadings) = x$varlabel
@@ -25,7 +47,7 @@ plot_loadings <- function(x, xlabel=NA, ylabel=NA,
   
 	ldf = melt(loadings)
 	colnames(ldf) = c("Group", "Factor", "value")
-  if (!any(is.na(sorting))) ldf$Group = factor(ldf$Group, levels=rownames(loadings)[sorting])
+  if (!any(is.na(sort_order))) ldf$Group = factor(ldf$Group, levels=rownames(loadings)[sort_order])
   ldf$Factor = as.factor(ldf$Factor)
   
   if (type=="color") {
@@ -33,35 +55,37 @@ plot_loadings <- function(x, xlabel=NA, ylabel=NA,
 	cl = colorRampPalette(color)(21)
   	lim = c(-1.0, 1)
   	p = ggplot(ldf, aes(x=Factor, y=Group, fill=value))
-  	p = p + scale_fill_gradientn(scale.name, colour=cl, limits = lim, breaks=breaks) 
+  	p = p + scale_fill_gradientn(scale_name, colour=cl, limits = lim, breaks=breaks) 
     p = p + geom_tile()
   }
   
-  if (type=="line") {
-    k = x$K
-    numgp = x$P
-    
-    ldf$numerfac = as.numeric(ldf$Factor)
-    ldf$xend     = ldf$numerfac+0.45*ldf$value
-    
-    xi = c(0.55, (1:k)+0.45, (1:(k-1))+0.55)
-    
-    p = ggplot(ldf, aes(x=numerfac, y=Group))
-    p = p + geom_vline(xintercept=1:k, colour="gray70")
-    p = p + geom_hline(aes(yintercept=Group), colour="gray86")
-    p = p + geom_vline(xintercept=xi, colour="gray70", linetype=2)
-    p = p + geom_segment(aes(xend = xend, yend=Group), size=2)
-    p = p + opts(panel.grid.y.major = theme_line(colour = 'gray60', linetype = 1))
-    p = p + geom_rect(aes(xmin = (0:k)+0.485, xmax=(0:k)+0.515, ymin=rep(0,k), ymax=rep(numgp+1, k)), 
-                      fill="gray80", color="gray80")
-    p = p+scale_y_discrete(limits=levels(ldf$Group))+xlim(c(0.5, k+0.45))
-    p = p + theme_bw() + scale_x_continuous("Factor", breaks=1:k)
-  }
-  
-  p = p+ ylab("")+xlab("")
-	if (!is.na(xlabel)) p = p+xlab(xlabel)
-	if (!is.na(ylabel)) p = p+ylab(ylabel) 
+  p = p+ ylab("Variable")+xlab("Factor")
   return(p)
+
+}
+
+# Display HPD intervals of factor loadings
+# @param x a bfa model object  
+# @param prob probability content of HPD interval
+# @export
+
+loadings_ci <- function(x, prob=0.95, sort_order=NA) {
+
+  it=HPDinterval(x, prob=prob)
+  it$loadings.mean = data.frame(mean(x)$loadings)
+  colnames(it$loadings.mean)=paste("Factor",1:x$K, sep='')
+  rownames(it$loadings.mean)=x$varlabel
+  d = ldply(it, function(x) data.frame( x, v=rownames(x)) )
+  pldf = cast(melt(d), v+variable~...)
+  if (any(is.na(sort_order))) {
+    sort_order = rev(order(x$varlabel))
+  }
+  pldf$v = factor(pldf$v, levels=x$varlabel[sort_order])
+  m=ggplot(pldf, aes(x=v, y=loadings.mean, ymin=loadings.lower, ymax=loadings.upper))
+  m=m+geom_hline(yintercept=0, linetype=2)+xlab("Variable")+ylab("Loading")
+  m=m+geom_pointrange()+facet_grid(~variable)+coord_flip()
+
+  return(m)
 
 }
 
