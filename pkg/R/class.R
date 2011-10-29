@@ -225,17 +225,24 @@ mean.bfa <- function(x, ...) {
 #' are matrices of dimension p x k or n x k, or NA's if loadings or scores is FALSE
 #' @method HPDinterval bfa
 #' @export
+
 HPDinterval.bfa = function(obj, prob=0.95, loadings=TRUE, scores=FALSE, ...) {
   load.lo = load.hi = score.lo = score.hi = NA
   p = obj$P
   k = obj$K
   n = obj$N
+  out=list()
   if(loadings) {
     co = get_coda(obj, loadings, scores=FALSE, scale = attr(obj, "type")!="gauss")
     inter = HPDinterval(co)
     load.lo = matrix(inter[,1], nrow=p)
     load.hi = matrix(inter[,2], nrow=p)
     rownames(load.lo) = rownames(load.hi) = obj$varlabel
+    colnames(load.lo) = colnames(load.hi) = paste("Factor",1:k, sep='')
+    out$loadings.lower = data.frame(load.lo)
+    rownames(out$loadings.lower)=obj$varlabel
+    out$loadings.upper = data.frame(load.hi)
+    rownames(out$loadings.upper)=obj$varlabel
   }
   if(scores) {
     co = get_coda(obj, loadings=FALSE, scores, scale = attr(obj, "type")!="gauss")
@@ -243,9 +250,16 @@ HPDinterval.bfa = function(obj, prob=0.95, loadings=TRUE, scores=FALSE, ...) {
     score.lo = matrix(inter[,1], nrow=n)
     score.hi = matrix(inter[,2], nrow=n)
     rownames(score.lo) = rownames(score.hi) = obj$obslabel
+    colnames(score.lo) = colnames(score.hi) = paste("Factor",1:k, sep='')
+    out$scores.lower = data.frame(score.lo)
+    rownames(out$scores.lower)=obj$obslabel
+    out$scores.upper = data.frame(score.hi)
+    rownames(out$scores.upper)=obj$obslabel
   }
-  return(list(loadings.lower=load.lo, loadings.upper=load.hi,
-              scores.lower=score.lo, scores.upper=score.hi))
+  for(m in out) {
+    colnames(m)=paste("Factor",1:obj$K, sep='')
+  }
+  return(out)
 }
 
 # Extract posterior variances from sbfac object
