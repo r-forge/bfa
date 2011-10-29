@@ -203,7 +203,6 @@ bfa_model <- function(x, data=NULL, num.factor=1, restrict=NA,
 #' @export
 print.bfa <- function(x, ...) {
 	cat("bfa model object\n")
-	cat("Use mean() or var() to get parameter estimates\n")
 	}
 
 #' Extract posterior means from bfa object
@@ -214,6 +213,39 @@ print.bfa <- function(x, ...) {
 #' @export
 mean.bfa <- function(x, ...) {
   return(list(loadings=x$post.loadings.mean, scores=x$post.scores.mean))
+}
+
+#' HPD intervals from a bfa object
+#' @param obj A bfa object
+#' @param prob Target probability content (see ?HPDinterval)
+#' @param loadings Compute interval for the loadings 
+#' @param scores Compute interval for the scores
+#' @param ... Ignored
+#' @return A list with elements loadings.lower, loadings.upper, scores.lower, scores.upper which 
+#' are matrices of dimension p x k or n x k, or NA's if loadings or scores is FALSE
+#' @method HPDinterval bfa
+#' @export
+HPDinterval.bfa = function(obj, prob=0.95, loadings=TRUE, scores=FALSE, ...) {
+  load.lo = load.hi = score.lo = score.hi = NA
+  p = obj$P
+  k = obj$K
+  n = obj$N
+  if(loadings) {
+    co = get_coda(obj, loadings, scores=FALSE, scale = attr(obj, "type")!="gauss")
+    inter = HPDinterval(co)
+    load.lo = matrix(inter[,1], nrow=p)
+    load.hi = matrix(inter[,2], nrow=p)
+    rownames(load.lo) = rownames(load.hi) = obj$varlabel
+  }
+  if(scores) {
+    co = get_coda(obj, loadings=FALSE, scores, scale = attr(obj, "type")!="gauss")
+    inter = HPDinterval(co)
+    score.lo = matrix(inter[,1], nrow=n)
+    score.hi = matrix(inter[,2], nrow=n)
+    rownames(score.lo) = rownames(score.hi) = obj$obslabel
+  }
+  return(list(loadings.lower=load.lo, loadings.upper=load.hi,
+              scores.lower=score.lo, scores.upper=score.hi))
 }
 
 # Extract posterior variances from sbfac object
