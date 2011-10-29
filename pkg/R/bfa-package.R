@@ -10,9 +10,9 @@
 #' }
 #'
 #' This package provides model fitting for several Bayesian factor models including 
-#' Gaussian, ordinal probit, mixed and semiparametric copula factor models. 
-#' Normal, continuous shrinkage and point-mass sparsity priors for factor loadings 
-#' are available. Currently only exploratory factor models are implemented.
+#' Gaussian, ordinal probit, mixed and semiparametric Gaussian copula factor models. 
+#' Normal, generalized double Pareto and point-mass sparsity priors for factor loadings 
+#' are available.
 #' 
 #' @name bfa-package
 #' @docType package
