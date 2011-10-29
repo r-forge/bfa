@@ -2,8 +2,9 @@
 \alias{plot_loadings}
 \title{Plots of factor loadings}
 \usage{
-  plot_loadings(x, type = "heatmap", sort_order = NA, color
-  = NA, scale_name = "Loading", prob = 0.95)
+  plot_loadings(x, type = c("heatmap", "credint"),
+  sort_order = NA, color = NA, scale_name = "Loading", prob
+  = 0.95)
 }
 \arguments{
   \item{x}{a bfa model object or a (loadings) matrix}
