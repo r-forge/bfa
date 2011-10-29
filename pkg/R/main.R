@@ -134,7 +134,7 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
 #' @param imh.iter Iterations used to build IMH proposal
 #' @param imh.burn Burn-in before collecting samples used to build IMH proposal (total burn-in is nburn+imh.iter+imh.burn)
 #' @param ... Prior parameters and other (experimental) arguments (see details)
-#' @return A S3 \code{bfa} object \code{model}, with posterior samples/summaries.
+#' @return An S3 \code{bfa} object \code{model}, with posterior samples/summaries.
 #' @export
 #' @examples \dontrun{
 #' require(MASS)
@@ -144,9 +144,12 @@ bfa_gauss <- function(x, data=NULL, num.factor=1, restrict=NA,
 #'                            levels=c("none", "enriched", "100%"))
 #' fit_cop = bfa_copula(~., data=UScereal[,-1], num.factor=2, nsim=5000, nburn=500, thin=2,
 #'                       normal.dist=rep(0,10), rest=list(c("sugars", 2, "0")),
-#'                       loading.prior="gdp", beta=0.2, keep.scores=T, init.fa=FALSE)
+#'                       loading.prior="gdp", keep.scores=T, init.fa=FALSE)
 #' plot_loadings(fit_cop)
 #' biplot(fit_cop, cex=c(0.8, 0.8))
+#' plot(get_coda(fit_cop))
+#' plot(get_coda(fit_cop, loadings=F, scores=T))
+#' HPDinterval(fit_cop)
 #' }
 
 
@@ -217,7 +220,7 @@ bfa_copula <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
 #' @param imh.iter Iterations used to build IMH proposal
 #' @param imh.burn Burn-in before collecting samples used to build IMH proposal (total burn-in is nburn+imh.iter+imh.burn)
 #' @param ... Prior parameters and other (experimental) arguments (see details)
-#' @return A S3 \code{bfa} object \code{model}, with posterior samples/summaries.
+#' @return An S3 \code{bfa} object \code{model}, with posterior samples/summaries.
 #' @export
 
 bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA, 
@@ -249,7 +252,7 @@ bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
   }
   
   if(imh) {
-    print("Building proposal...")
+    cat("Building proposal...")
     model = fit_bfa(model, imh.iter, imh.burn, 1, print.status,
                    keep.scores, keep.loadings, loading.prior,
                    factor.scales, px, coda, coda.scale, save_max=TRUE, quiet=TRUE, ...)
@@ -285,7 +288,7 @@ bfa_mixed <- function(x, data=NULL, num.factor=1, restrict=NA, normal.dist=NA,
       precs[[ind]] = prop.prec
       means[[ind]] = prop.mean
     }
-    print("Done.")
+    cat("Done.")
     model = fit_bfa(model, nsim, nburn, thin, print.status,
                    keep.scores, keep.loadings, loading.prior,
                    factor.scales, px, coda, coda.scale, imh=1, 
