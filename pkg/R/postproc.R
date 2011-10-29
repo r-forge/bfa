@@ -3,6 +3,7 @@ NULL
 #' Invert the matrix lam*t(lam)+diag(u) via Woodbury identity
 #' @param lam p by k matrix
 #' @param u p dimensional vector
+#' @return The matrix inverse
 #' @export
 woodbury = function(lam, u) {
   k = ncol(lam)
@@ -18,11 +19,14 @@ woodbury = function(lam, u) {
   return(out)
 }
 
-#' Compute regression coefficients for variables in (index) against the rest
+#' Compute samples of regression coefficients
 #' @param model \code{bfa} model object
-#' @param index index(es) of the response 
+#' @param resp.var A character vector giving the name(s) of the response
+#' @return An array of dimension length(index) x p-length(index) x (no. of mcmc samples) with 
+#' posterior samples of regression coefficients
 #' @export
-reg.samp = function(model, index = c(1)) {
+reg.samp = function(model, resp.var) {
+  index = which(resp.var %in% colnames(model$original.data))
   pl = model$post.loadings
   ns = dim(pl)[3]
   out = array(NA, dim=c(length(index),model$P-length(index),ns))
@@ -40,42 +44,63 @@ reg.samp = function(model, index = c(1)) {
   return(out)
 }
 
-#' Compute correlation matrix at each MCMC iteration
+#' Compute samples of the correlation matrix
 #' @param model \code{bfa} model object
+#' @return A p x p x (no. of mcmc samples) array containing samples of the correlation matrix
 #' @export
 corr.samp = function(model) {
-  set.seed(1)
+  pl=model$post.loadings
+  ns = dim(pl)[3]
+  out = array(NA, dim=c(model$P, model$P, ns))
+  lam2 = apply(model$post.loadings, c(1,3), function(x) sum(x^2))
+  U = 1/(t(model$post.sigma2)+lam2)
+  for (i in 1:ns) {
+    pl[, , i]  = pl[, , i]*sqrt(U[,i]) #/sqrt(1 + rowSums(pl[, , i]^2))
+    out[, , i] = pl[, , i]%*%t(pl[, , i])+diag(U[,i])
+  }
+  return(out)
+}
+
+#' Compute samples of the covariance matrix
+#' @param model \code{bfa} model object
+#' @return A p x p x (no. of mcmc samples) array containing samples of the covariance matrix
+#' @export
+cov.samp = function(model) {
   pl=model$post.loadings
   ns = dim(pl)[3]
   out = array(NA, dim=c(model$P, model$P, ns))
   for (i in 1:ns) {
-    u = 1/(1 + rowSums(pl[, , i]^2))
-    pl[, , i]  = pl[, , i]*sqrt(u) #/sqrt(1 + rowSums(pl[, , i]^2))
-    out[, , i] = pl[, , i]%*%t(pl[, , i])+diag(u)
+    out[, , i] = pl[, , i]%*%t(pl[, , i])+diag(model$post.sigma2[i,])
   }
   return(out)
 }
 
 #' Posterior predictive and univariate conditional posterior predictive distributions
 #' Posterior predictive and univariate conditional posterior predictive distributions, currently
-#' implemented only for factor copula models
+#' implemented only for copula models. If resp.var is not NA, returns an estimate of the conditional
+#' cdf at every observed data point for each MCMC iterate. If resp.var is NA, returns draws from the
+#' joint posterior predictive.
 #' @param object \code{bfa} model object
-#' @param resp.var Response variable (see details). If NA, return draws from the joint
-#' posterior predictive. Otherwise 
+#' @param resp.var Either a character vector (length 1) with name of the response variable for 
+#' conditional, or NA for draws from the joint posterior predictive. 
 #' @param cond.vars Conditioning variables; either a list like list(X1=val1, X2=val2) with
 #' X1, X2 variables in the original data frame, or a P length vector with either the conditioning
 #' value or NA (for marginalized variables). Ignored if resp.var is NA
 #' @param numeric.as.factor Treat numeric variables as ordinal when conditioning
 #' @param ... Ignored
+#' @return A matrix where each row is either a sample of the conditional posterior predictive 
+#' cdf at each datapoint, or a single sample from the joint posterior predictive.
 #' @method predict bfa
 #' @export
 
-predict.bfa = function(object, resp.var=NA, cond.vars=NA,
-                       numeric.as.factor=TRUE, ...) {
+predict.bfa = function(object, resp.var=NA, cond.vars=NA, numeric.as.factor=TRUE, ...) {
+  mtype = attr(object, "type")
+  if(mtype!="copula") stop("Prediction only available for copula models (see also ?reg.coef)")
+  
   n.mcmc=dim(object$post.loadings)[3]
   
   if(!is.na(resp.var)) {
-    y.idx = which(resp.var==colnames(object$original.data))
+    y.idx = which(resp.var %in% colnames(object$original.data))
     
     if(is.list(cond.vars)) {
       x.var = names(cond.vars)
