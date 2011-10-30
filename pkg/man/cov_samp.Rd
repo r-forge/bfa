@@ -1,8 +1,8 @@
-\name{cov.samp}
-\alias{cov.samp}
+\name{cov_samp}
+\alias{cov_samp}
 \title{Compute samples of the covariance matrix}
 \usage{
-  cov.samp(model)
+  cov_samp(model)
 }
 \arguments{
   \item{model}{\code{bfa} model object}

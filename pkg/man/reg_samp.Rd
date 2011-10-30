@@ -1,8 +1,8 @@
-\name{reg.samp}
-\alias{reg.samp}
+\name{reg_samp}
+\alias{reg_samp}
 \title{Compute samples of regression coefficients}
 \usage{
-  reg.samp(model, resp.var)
+  reg_samp(model, resp.var)
 }
 \arguments{
   \item{model}{\code{bfa} model object}

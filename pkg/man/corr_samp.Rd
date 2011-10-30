@@ -1,8 +1,8 @@
-\name{corr.samp}
-\alias{corr.samp}
+\name{corr_samp}
+\alias{corr_samp}
 \title{Compute samples of the correlation matrix}
 \usage{
-  corr.samp(model)
+  corr_samp(model)
 }
 \arguments{
   \item{model}{\code{bfa} model object}
