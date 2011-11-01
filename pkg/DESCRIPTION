@@ -9,7 +9,7 @@ Author: Jared Murray
 Description: This package provides model fitting for
     several Bayesian factor models including Gaussian,
     ordinal probit, mixed and semiparametric Gaussian
-    copula factor models.
+    copula factor models under a range of priors.
 SystemRequirements: GNU make
 Version: 0.2.2
 Date: 2011-10-31
